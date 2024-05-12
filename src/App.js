@@ -1,25 +1,59 @@
-import logo from './logo.svg';
-import './App.css';
+// App.js
+import React, { useState, useEffect } from 'react';
+import GoogleLoginComponent from './googleLogin';
+import Profile from './profile';
 
-function App() {
+const App = () => {
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const isInInstagramApp = userAgent.includes('instagram');
+    
+    if (isInInstagramApp) {
+      const handleLinkClick = (event) => {
+        const isExternalLink = event.target.tagName === 'A' && event.target.origin !== window.location.origin;
+        if (isExternalLink) {
+          event.preventDefault();
+          window.open(event.target.href, '_system');
+        }
+      };
+      
+      document.body.addEventListener('click', handleLinkClick);
+      
+      return () => {
+        document.body.removeEventListener('click', handleLinkClick);
+      };
+    }
+  }, []);
+
+  const handleLoginSuccess = (profile) => {
+    setUser(profile);
+    setError(null);
+  };
+
+  const handleLoginFailure = (error) => {
+    setError(error);
+    setUser(null);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {!user ? (
+        <div>
+          <h1>Login</h1>
+          <GoogleLoginComponent
+            onSuccess={handleLoginSuccess}
+            onFailure={handleLoginFailure}
+          />
+          {error && <p>Error: {error}</p>}
+        </div>
+      ) : (
+        <Profile user={user} />
+      )}
     </div>
   );
-}
+};
 
 export default App;

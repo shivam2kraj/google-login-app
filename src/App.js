@@ -46,6 +46,7 @@ const App = () => {
           <GoogleLoginComponent
             onSuccess={handleLoginSuccess}
             onFailure={handleLoginFailure}
+            
           />
           {error && <p>Error: {error}</p>}
         </div>
